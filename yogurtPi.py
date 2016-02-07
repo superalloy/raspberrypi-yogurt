@@ -45,10 +45,6 @@ state = state_not_started
 # Initialize the LCD using the pins above.
 lcd = LCD(lcd_rs, lcd_en, lcd_d4, lcd_d5, lcd_d6, lcd_d7, lcd_cols, lcd_rows, lcd_backlight)
 
-dt = datetime.now()
-data_run =
-data_run = time.time()
-
 # Print a two line message
 lcd.message('Yogurt Pi')
 
