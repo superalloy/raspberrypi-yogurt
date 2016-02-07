@@ -7,11 +7,12 @@ import logging
 import datetime
 import RPi.GPIO as GPIO
 import math
+import threading
 sensor = W1ThermSensor()
 
 logFN = time.strftime("logs/%Y-%m-%d_%H%M%S") + "_yPi_log.txt"
 
-logging.basicConfig(filename=logFN, level=logging.DEGUG,
+logging.basicConfig(filename=logFN, level=logging.DEBUG,
 	format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
 # Raspberry Pi pin configuration:
@@ -34,6 +35,7 @@ temp_1 = 90
 temp_2 = 110
 time_1 = 600
 time_2 = 28800 #8 hours in seconds
+hit_target = False
 
 state_not_started = 1
 state_pre_culture = 2
@@ -64,13 +66,15 @@ def startPreCulture(init_state):
 	global state
 	state = state_pre_culture
 
+temp_f = sensor.get_temperature(W1ThermSensor.DEGREES_F)
 def logData():
+	threading.Timer(5.0, logData).start()
 	logging.info('state: %s' % (state) + "\tT: %s" % (temp_f))
 
+logData()
 while 1:
-	temp_f = sensor.get_temperature(W1ThermSensor.DEGREES_F)
 	button_state = GPIO.input(button_pin)
-	logData()
+	temp_f = sensor.get_temperature(W1ThermSensor.DEGREES_F)
 	if button_state == False:
 		if state == state_not_started:
 			startPreCulture(state)
@@ -82,6 +86,7 @@ while 1:
 
 	elif (state == state_pre_culture):
 		setTemp(temp_1)
+
 		rem_min = (finishTime - time.time()) / 60
 		rem_min = math.trunc(rem_min)
 		rem_sec = (finishTime - time.time()) - 60*rem_min
