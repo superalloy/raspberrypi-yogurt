@@ -64,7 +64,7 @@ def startPreCulture(init_state):
 	global state
 	state = state_pre_culture
 
-def logData:
+def logData():
 	logging.info('state: %s' % (state) + "\tT: %s" % (temp_f))
 
 while 1:
