@@ -51,18 +51,27 @@ lcd = LCD(lcd_rs, lcd_en, lcd_d4, lcd_d5, lcd_d6, lcd_d7, lcd_cols, lcd_rows, lc
 lcd.message('Yogurt Pi')
 
 def setTemp(T):
+	global hit_target
+	global finishTime
 	if (temp_f < T):
+		if (rampUpDown == 2):
+			if (hit_target == False):
+				hit_target = True
 		#turn on the heater
 		print 'turn it on'
 	else:
-		#turn off the heate
+		if (rampUpDown == 1):
+			if (hit_target == False):
+				hit_target = True
+				startTime = time.time()
+				if (state == state_pre_culture):
+					finishTime = startTime + time_1
+
+		#turn off the heater
 		print 'turn it off'
 
-
 def startPreCulture(init_state):
-	startTime = time.time()
-	global finishTime
-	finishTime = startTime + time_1
+	global rampUpDown = 1
 	global state
 	state = state_pre_culture
 
@@ -86,10 +95,13 @@ while 1:
 
 	elif (state == state_pre_culture):
 		setTemp(temp_1)
-
-		rem_min = (finishTime - time.time()) / 60
-		rem_min = math.trunc(rem_min)
-		rem_sec = (finishTime - time.time()) - 60*rem_min
+		if (hit_target == True):
+			rem_min = (finishTime - time.time()) / 60
+			rem_min = math.trunc(rem_min)
+			rem_sec = (finishTime - time.time()) - 60*rem_min
+			remaining = "{:.0f}".format(rem_min) + ":" + "{0:02.0f}".format(rem_sec)
+		else:
+			remaining = "waiting"
 		lcd.clear()
-		lcd.message('Target: %s\nT:%sF;t:%s:%s' % (temp_1, temp_f,("{:.0f}".format(rem_min)), ("{0:02.0f}".format(rem_sec))))
+		lcd.message('Target: %s\nT:%sF;t:%s' % (temp_1, temp_f, remaining))
 		time.sleep(0.10)
