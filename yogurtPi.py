@@ -13,14 +13,10 @@ import threading
 from config import *
 
 sensor = W1ThermSensor()
-
 logFN = time.strftime("logs/%Y-%m-%d_%H%M%S") + "_yPi_log.txt"
-
 logging.basicConfig(filename=logFN, level=logging.DEBUG,
 	format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 client = TwilioRestClient(account_sid, auth_token)
-
-#GPIO.setmode(GPIO.BCM)
 GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 lcd_cols = 16
