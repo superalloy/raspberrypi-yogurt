@@ -123,7 +123,7 @@ while 1:
 			startIncubation()
 	if(state == state_not_started):
 		lcd.clear()
-		lcd.message('Press to start\nT: %sF, t: ' % (temp_f))
+		lcd.message('Press to start\n%s' % (temp_f))
 		time.sleep(0.10)
 
 	elif (state == state_pre_culture):
@@ -133,7 +133,7 @@ while 1:
 			if (remaining[1] <=0):
 				startWaitCulture()
 		else:
-			remaining = "waiting"
+			remaining = "wait", 0
 		lcd.clear()
 		lcd.message('GOAL: %s\n%s %s' % (temp_1, temp_f, remaining[0]))
 		time.sleep(0.10)
@@ -141,10 +141,10 @@ while 1:
 		setTemp(temp_2)
 		if (hit_target == True):
 			lcd.clear()
-			lcd.message('Add Culture and\nPress Button')
+			lcd.message('Add Culture\nPress Button')
 		else:
 			lcd.clear()
-			lcd.message('cooling off')
+			lcd.message('GOAL: %s\n%s cooling' % (temp_2, temp_f))
 	elif (state == state_incubation):
 		setTemp(temp_2)
 		if (hit_target == True):
@@ -152,7 +152,7 @@ while 1:
 			if (remaining[1] <= 0):
 				endIncubation()
 		else:
-			remaining = "waiting"
+			remaining = "waiting", 0
 		lcd.clear()
 		lcd.message('GOAL: %s\n%s %s' % (temp_2, temp_f, remaining[0]))
 		time.sleep(0.10)
