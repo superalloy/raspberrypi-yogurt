@@ -67,7 +67,8 @@ def setTemp(T):
 				startTime = time.time()
 				if (state == state_pre_culture):
 					finishTime = startTime + time_1
-
+				elif (state == incubation):
+					finishTime = startTime + time_2
 		#turn off the heater
 #		print 'turn it off'
 
@@ -105,6 +106,9 @@ while 1:
 		if state == state_not_started:
 			logData()
 			startPreCulture(state)
+		elif (state == state_waiting_culture):
+			#culture has been added
+			startIncubation()
 
 	if(state == state_not_started):
 		lcd.clear()
@@ -127,6 +131,11 @@ while 1:
 		lcd.message('Target: %s\nT:%sF;t:%s' % (temp_1, temp_f, remaining))
 		time.sleep(0.10)
 	elif (state == state_waiting_culture):
+		setTemp(temp_2)
+		if (hit_target == True):
+			lcd.clear()
+			lcd.message('Add Culture and\nPress Button')
+	elif (state == state_incubation):
 		setTemp(temp_2)
 		if (hit_target == True):
 			rem_min = (finishTime - time.time()) / 60
