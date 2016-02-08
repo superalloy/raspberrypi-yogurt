@@ -42,6 +42,7 @@ state_pre_culture = 2
 state_waiting_culture = 3
 state_incubation = 4
 state_done = 5
+rampUpDown = 1 #1 is a ramp up temp, 2 is a ramp down temp
 
 state = state_not_started
 # Initialize the LCD using the pins above.
@@ -58,7 +59,7 @@ def setTemp(T):
 			if (hit_target == False):
 				hit_target = True
 		#turn on the heater
-		print 'turn it on'
+#		print 'turn it on'
 	else:
 		if (rampUpDown == 1):
 			if (hit_target == False):
@@ -68,24 +69,41 @@ def setTemp(T):
 					finishTime = startTime + time_1
 
 		#turn off the heater
-		print 'turn it off'
+#		print 'turn it off'
 
 def startPreCulture(init_state):
-	global rampUpDown = 1
+	global rampUpDown
+	rampUpDown = 1
 	global state
 	state = state_pre_culture
 
-temp_f = sensor.get_temperature(W1ThermSensor.DEGREES_F)
+def startWaitCulture():
+	global rampUpDown
+	rampUpDown = 2
+	global state
+	state = state_waiting_culture
+
+def startIncubation():
+	global rampUpDown
+	rampUpDown = 1
+	global state
+	state = state_incubation
+
+def endIncubation():
+	print "done"
+#	sendText("Yogurt is done")
+
 def logData():
 	threading.Timer(5.0, logData).start()
 	logging.info('state: %s' % (state) + "\tT: %s" % (temp_f))
 
-logData()
+logging.info('System starting, waiting for input')
 while 1:
 	button_state = GPIO.input(button_pin)
 	temp_f = sensor.get_temperature(W1ThermSensor.DEGREES_F)
 	if button_state == False:
 		if state == state_not_started:
+			logData()
 			startPreCulture(state)
 
 	if(state == state_not_started):
@@ -100,8 +118,25 @@ while 1:
 			rem_min = math.trunc(rem_min)
 			rem_sec = (finishTime - time.time()) - 60*rem_min
 			remaining = "{:.0f}".format(rem_min) + ":" + "{0:02.0f}".format(rem_sec)
+
+			if (rem_min <= 0 and rem_sec <=0):
+				startWaitCulture()
 		else:
 			remaining = "waiting"
 		lcd.clear()
 		lcd.message('Target: %s\nT:%sF;t:%s' % (temp_1, temp_f, remaining))
+		time.sleep(0.10)
+	elif (state == state_waiting_culture):
+		setTemp(temp_2)
+		if (hit_target == True):
+			rem_min = (finishTime - time.time()) / 60
+			rem_min = math.trunc(rem_min)
+			rem_sec = (finishTime - time.time()) - 60 * rem_min
+			remaining = "{:.0f}".format(rem_min) + ":" + "{0:02.0f}".format(rem_sec)
+			if (rem_min <= 0 and rem_sec <= 0):
+				endIncubation()
+		else:
+			remaining = "waiting"
+		lcd.clear()
+		lcd.message('Target: %s\nT:%s;t:%s' % (temp_2, temp_f, remaining))
 		time.sleep(0.10)
