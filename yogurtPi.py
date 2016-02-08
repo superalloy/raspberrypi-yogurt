@@ -45,6 +45,8 @@ def setTemp(T):
 		if (rampUpDown == 2):
 			if (hit_target == False):
 				hit_target = True
+				if (state == state_pre_culture):
+					sendTextMessage('Add Culture to the Yogurt')
 		#turn on the heater
 #		print 'turn it on'
 	else:
@@ -129,7 +131,6 @@ while 1:
 	elif (state == state_waiting_culture):
 		setTemp(temp_2)
 		if (hit_target == True):
-			sendTextMessage('Add Culture to the Yogurt')
 			lcd.clear()
 			lcd.message('Add Culture\nPress Button')
 		else:
@@ -141,8 +142,14 @@ while 1:
 			remaining = getTimeRemaining(finishTime)
 			if (remaining[1] <= 0):
 				endIncubation()
+				state = state_done
 		else:
 			remaining = "waiting", 0
 		lcd.clear()
 		lcd.message('GOAL: %s\n%s %s' % (temp_2, temp_f, remaining[0]))
 		time.sleep(0.10)
+	elif (state == state_done):
+		setTemp(temp_2)
+		remaining = getTimeRemaining(finishTime)
+		lcd.clear()
+		lcd.message('DONE! FINISHED\n%s AGO' % (remaining[0]))
