@@ -2,39 +2,30 @@
 
 from w1thermsensor import W1ThermSensor
 from Adafruit_CharLCD import Adafruit_CharLCD as LCD
+from twilio.rest import TwilioRestClient
+
 import time
 import logging
 import datetime
 import RPi.GPIO as GPIO
 import math
 import threading
+import config
+
 sensor = W1ThermSensor()
 
 logFN = time.strftime("logs/%Y-%m-%d_%H%M%S") + "_yPi_log.txt"
 
 logging.basicConfig(filename=logFN, level=logging.DEBUG,
 	format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+client = TwilioRestClient(account_sid, auth_token)
 
-# Raspberry Pi pin configuration:
-lcd_rs        = 27  # Note this might need to be changed to 21 for older revision Pisn
-lcd_en        = 22
-lcd_d4        = 25
-lcd_d5        = 24
-lcd_d6        = 23
-lcd_d7        = 18
-lcd_backlight = 4
-button_pin 	= 5
 #GPIO.setmode(GPIO.BCM)
 GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 lcd_cols = 16
 lcd_rows = 2
 
-# initialize temp and time vars
-temp_1 = 90
-temp_2 = 110
-time_1 = 200
-time_2 = 28800 #8 hours in seconds
 hit_target = False
 
 state_not_started = 1
@@ -71,6 +62,8 @@ def setTemp(T):
 					finishTime = startTime + time_2
 		#turn off the heater
 #		print 'turn it off'
+def sendTextMessage(msg):
+	message = client.message.create(to=toText, from_=fromText, body=msg)
 
 def startPreCulture(init_state):
 	global rampUpDown
