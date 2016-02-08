@@ -74,20 +74,26 @@ def setTemp(T):
 
 def startPreCulture(init_state):
 	global rampUpDown
-	rampUpDown = 1
 	global state
+	global hit_target
+	rampUpDown = 1
+	hit_target = False
 	state = state_pre_culture
 
 def startWaitCulture():
 	global rampUpDown
-	rampUpDown = 2
 	global state
+	global hit_target
+	rampUpDown = 2
+	hit_target = False
 	state = state_waiting_culture
 
 def startIncubation():
 	global rampUpDown
-	rampUpDown = 1
 	global state
+	global hit_target
+	rampUpDown = 1
+	hit_target = False
 	state = state_incubation
 
 def endIncubation():
@@ -97,6 +103,12 @@ def endIncubation():
 def logData():
 	threading.Timer(5.0, logData).start()
 	logging.info('state: %s' % (state) + "\tT: %s" % (temp_f))
+
+def getTimeRemaining(fTime):
+	seconds = (fTime - time.time())
+	m, s = divmod(seconds, 60)
+	h, m = divmod(m, 60)
+	return "%d:%02d:%02d" % (h, m, s)
 
 logging.info('System starting, waiting for input')
 while 1:
@@ -109,7 +121,6 @@ while 1:
 		elif (state == state_waiting_culture):
 			#culture has been added
 			startIncubation()
-
 	if(state == state_not_started):
 		lcd.clear()
 		lcd.message('Press to start\nT: %sF, t: ' % (temp_f))
@@ -118,17 +129,13 @@ while 1:
 	elif (state == state_pre_culture):
 		setTemp(temp_1)
 		if (hit_target == True):
-			rem_min = (finishTime - time.time()) / 60
-			rem_min = math.trunc(rem_min)
-			rem_sec = (finishTime - time.time()) - 60*rem_min
-			remaining = "{:.0f}".format(rem_min) + ":" + "{0:02.0f}".format(rem_sec)
-
+			remaining = getTimeRemaining(finishTime)
 			if (rem_min <= 0 and rem_sec <=0):
 				startWaitCulture()
 		else:
 			remaining = "waiting"
 		lcd.clear()
-		lcd.message('Target: %s\nT:%sF;t:%s' % (temp_1, temp_f, remaining))
+		lcd.message('GOAL: %s\nT:%s\xb0F;t:%s' % (temp_1, temp_f, remaining))
 		time.sleep(0.10)
 	elif (state == state_waiting_culture):
 		setTemp(temp_2)
@@ -138,14 +145,11 @@ while 1:
 	elif (state == state_incubation):
 		setTemp(temp_2)
 		if (hit_target == True):
-			rem_min = (finishTime - time.time()) / 60
-			rem_min = math.trunc(rem_min)
-			rem_sec = (finishTime - time.time()) - 60 * rem_min
-			remaining = "{:.0f}".format(rem_min) + ":" + "{0:02.0f}".format(rem_sec)
+			remaining = getTimeRemaining(finishTime)
 			if (rem_min <= 0 and rem_sec <= 0):
 				endIncubation()
 		else:
 			remaining = "waiting"
 		lcd.clear()
-		lcd.message('Target: %s\nT:%s;t:%s' % (temp_2, temp_f, remaining))
+		lcd.message('Goal: %s\nT:%s\xb0F;t:%s' % (temp_2, temp_f, remaining))
 		time.sleep(0.10)
