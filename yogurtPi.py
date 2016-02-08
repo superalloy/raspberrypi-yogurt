@@ -10,7 +10,7 @@ import datetime
 import RPi.GPIO as GPIO
 import math
 import threading
-import config
+from config import *
 
 sensor = W1ThermSensor()
 
