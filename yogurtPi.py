@@ -108,7 +108,7 @@ def getTimeRemaining(fTime):
 	seconds = (fTime - time.time())
 	m, s = divmod(seconds, 60)
 	h, m = divmod(m, 60)
-	return "%d:%02d:%02d" % (h, m, s)
+	return ("%d:%02d:%02d" % (h, m, s), seconds)
 
 logging.info('System starting, waiting for input')
 while 1:
@@ -130,12 +130,12 @@ while 1:
 		setTemp(temp_1)
 		if (hit_target == True):
 			remaining = getTimeRemaining(finishTime)
-			if (rem_min <= 0 and rem_sec <=0):
+			if (remaining[1] <=0):
 				startWaitCulture()
 		else:
 			remaining = "waiting"
 		lcd.clear()
-		lcd.message('GOAL: %s\nT:%s\xb0F;t:%s' % (temp_1, temp_f, remaining))
+		lcd.message('GOAL: %s\nT:%s\xb0F;t:%s' % (temp_1, temp_f, remaining[0]))
 		time.sleep(0.10)
 	elif (state == state_waiting_culture):
 		setTemp(temp_2)
@@ -146,10 +146,10 @@ while 1:
 		setTemp(temp_2)
 		if (hit_target == True):
 			remaining = getTimeRemaining(finishTime)
-			if (rem_min <= 0 and rem_sec <= 0):
+			if (remaining[1] <= 0):
 				endIncubation()
 		else:
 			remaining = "waiting"
 		lcd.clear()
-		lcd.message('Goal: %s\nT:%s\xb0F;t:%s' % (temp_2, temp_f, remaining))
+		lcd.message('Goal: %s\nT:%s\xb0F;t:%s' % (temp_2, temp_f, remaining[0]))
 		time.sleep(0.10)
