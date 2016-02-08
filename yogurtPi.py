@@ -33,7 +33,7 @@ lcd_rows = 2
 # initialize temp and time vars
 temp_1 = 90
 temp_2 = 110
-time_1 = 600
+time_1 = 200
 time_2 = 28800 #8 hours in seconds
 hit_target = False
 
@@ -67,7 +67,7 @@ def setTemp(T):
 				startTime = time.time()
 				if (state == state_pre_culture):
 					finishTime = startTime + time_1
-				elif (state == incubation):
+				elif (state == state_incubation):
 					finishTime = startTime + time_2
 		#turn off the heater
 #		print 'turn it off'
@@ -135,13 +135,16 @@ while 1:
 		else:
 			remaining = "waiting"
 		lcd.clear()
-		lcd.message('GOAL: %s\nT:%s\xb0F;t:%s' % (temp_1, temp_f, remaining[0]))
+		lcd.message('GOAL: %s\n%s %s' % (temp_1, temp_f, remaining[0]))
 		time.sleep(0.10)
 	elif (state == state_waiting_culture):
 		setTemp(temp_2)
 		if (hit_target == True):
 			lcd.clear()
 			lcd.message('Add Culture and\nPress Button')
+		else:
+			lcd.clear()
+			lcd.message('cooling off')
 	elif (state == state_incubation):
 		setTemp(temp_2)
 		if (hit_target == True):
@@ -151,5 +154,5 @@ while 1:
 		else:
 			remaining = "waiting"
 		lcd.clear()
-		lcd.message('Goal: %s\nT:%s\xb0F;t:%s' % (temp_2, temp_f, remaining[0]))
+		lcd.message('GOAL: %s\n%s %s' % (temp_2, temp_f, remaining[0]))
 		time.sleep(0.10)
