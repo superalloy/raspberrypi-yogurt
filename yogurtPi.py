@@ -91,7 +91,7 @@ def startIncubation():
 
 def endIncubation():
 	print "done"
-#	sendText("Yogurt is done")
+	sendTextMessage ('Yogurt is done, get it in the fridge!')
 
 def logData():
 	threading.Timer(5.0, logData).start()
@@ -133,6 +133,7 @@ while 1:
 	elif (state == state_waiting_culture):
 		setTemp(temp_2)
 		if (hit_target == True):
+			sendTextMessage('Add Culture to the Yogurt')
 			lcd.clear()
 			lcd.message('Add Culture\nPress Button')
 		else:
